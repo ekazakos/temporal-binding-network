@@ -7,6 +7,6 @@ Evangelos Kazakos, Arsha Nagrani, Andrew Zisserman, Dima Damen, <strong>EPIC-Fus
 
 [Project's webpage](https://ekazakos.github.io/TBN/)
 
-[ArXiv pape](https://arxiv.org/abs/1908.08498)
+[ArXiv paper](https://arxiv.org/abs/1908.08498)
 
 <strong>Code will be available soon!</strong>
