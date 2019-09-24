@@ -1,0 +1,14 @@
+submit_kfold_jobs.py
+submit_jobs_fuse_*.py
+test_fusion.py
+sftp-config*.json
+*.py[cod]
+/scores/*
+/jobs/*
+/evaluation/*
+/stats/*
+/models/*
+/.idea/*
+*.o*
+*.err*
+.DS_Store
