@@ -78,7 +78,7 @@ change set `use_audio_dict=False` in `TBNDataset` in `dataset.py`.
 
 To reproduce the results of the full RGB, Flow, Audio model, run:
 ```
-python train.py epic RGB Flow Spec --train_list ~/annotations/EPIC_train_action_labels.pkl --val_list ~/annotations-test/EPIC_test_val_action_labels.pkl --visual_path /path/to/rgb+flow --audio_path /path/to/audio --arch BNInception 
+python train.py epic RGB Flow Spec --train_list /path/to/EPIC_train_action_labels.pkl --val_list /path/to/EPIC_val_action_labels.pkl --visual_path /path/to/rgb+flow --audio_path /path/to/audio --arch BNInception 
 --num_segments 3 --dropout 0.5 --epochs 80 -b 128 --lr 0.01 --lr_steps 60 --gd 20 --partialbn --eval-freq 1 -j 40 
 --pretrained_flow_weights
 ```
@@ -86,29 +86,48 @@ python train.py epic RGB Flow Spec --train_list ~/annotations/EPIC_train_action_
 Individual modalities can be trained, as well as any combination of 2 modalities. 
 To train audio, run:
 ```
-python train.py epic Spec --train_list ~/annotations/EPIC_train_action_labels.pkl --val_list ~/annotations-test/EPIC_test_val_action_labels.pkl --audio_path ~/data-private/epic/sound/sound.pkl --arch BNInception --num_segments 3 
+python train.py epic Spec --train_list /path/to/EPIC_train_action_labels.pkl --val_list /path/to/EPIC_val_action_labels.pkl 
+--audio_path /path/to/audio --arch BNInception --num_segments 3 
 --dropout 0.5 --epochs 80 -b 128 --lr 0.001 --lr_steps 60 --gd 20 --partialbn --eval-freq 1 -j 40 
 ```
 
 To train RGB, run:
 ```
-python train.py epic RGB  --train_list ~/annotations/EPIC_train_action_labels.pkl --val_list ~/annotations-test/EPIC_test_val_action_labels.pkl --visual_path /path/to/rgb+flow --arch BNInception --num_segments 3 --dropout 0.5 
+python train.py epic RGB  --train_list /path/to/EPIC_train_action_labels.pkl --val_list /path/to/EPIC_val_action_labels.pkl 
+--visual_path /path/to/rgb+flow --arch BNInception --num_segments 3 --dropout 0.5 
 --epochs 80 -b 128 --lr 0.01 --lr_steps 60 --gd 20 --partialbn --eval-freq 1 -j 40 
 ```
 
 To train flow, run:
 ```
-python train.py epic Flow  --train_list ~/annotations/EPIC_train_action_labels.pkl --val_list ~/annotations-test/EPIC_test_val_action_labels.pkl --visual_path /path/to/rgb+flow --arch BNInception --num_segments 3 --dropout 0.5 
+python train.py epic Flow  --train_list /path/to/EPIC_train_action_labels.pkl --val_list /path/to/EPIC_val_action_labels.pkl 
+--visual_path /path/to/rgb+flow --arch BNInception --num_segments 3 --dropout 0.5 
 --epochs 80 -b 128 --lr 0.001 --lr_steps 60 --gd 20 --partialbn --eval-freq 1 -j 40 --pretrained_flow_weights
 ```
 
 Example of training RGB+Audio (any other combination can be used):
 ```
-python train.py epic RGB Spec --train_list ~/annotations/EPIC_train_action_labels.pkl --val_list ~/annotations-test/EPIC_test_val_action_labels.pkl --visual_path /path/to/rgb+flow --audio_path /path/to/audio --arch BNInception 
+python train.py epic RGB Spec --train_list /path/to/EPIC_train_action_labels.pkl --val_list /path/to/EPIC_val_action_labels.pkl --visual_path /path/to/rgb+flow --audio_path /path/to/audio --arch BNInception 
 --num_segments 3 --dropout 0.5 --epochs 80 -b 128 --lr 0.01 --lr_steps 60 --gd 20 --partialbn --eval-freq 1 -j 40 
 ```
 
-`EPIC_train_action_labels.pkl` and `EPIC_test_val_action_labels.pkl` should be the result of spliting the original [EPIC_train_action_labels.pkl](https://github.com/epic-kitchens/annotations/blob/master/EPIC_train_action_labels.csv) into training and validation set. 
+`EPIC_train_action_labels.pkl` and `EPIC_val_action_labels.pkl` should be the result of spliting the original [EPIC_train_action_labels.pkl](https://github.com/epic-kitchens/annotations/blob/master/EPIC_train_action_labels.csv) into training and validation set. 
+
+## Testing
+
+To compute scores, save scores and labels, and print the accuracy of the validation set using the full modalities, run:
+
+```
+python test.py epic RGB Flow Spec path/to/checkpoint --test_list /path/to/EPIC_val_action_labels.pkl --visual_path /path/to/rgb+flow --audio_path /path/to/audio --arch BNInception --scores_root scores/ --test_segments 25 --test_crops 1  --dropout 0.5 -j 40
+```
+
+To compute and save scores of the test sets (S1/S2) (since we do not have access to the labels), run:
+
+```
+python test.py epic RGB Flow Spec path/to/checkpoint --test_list /path/to/EPIC_test_s1_timestamps.pkl /path/to/EPIC_test_s2_timestamps.pkl --visual_path /path/to/rgb+flow --audio_path /path/to/audio --arch BNInception --scores_root scores/ --test_segments 25 --test_crops 1  --dropout 0.5 -j 40
+```
+
+`EPIC_test_s1_timestamps.pkl` and `EPIC_test_s2_timestamps.pkl` can be found [here](https://github.com/epic-kitchens/annotations). Similarly testing can be done for any combination of modalities, or individual modalities.
 
 ## Publication
 
