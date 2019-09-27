@@ -54,7 +54,7 @@ python preprocessing_epic/symlinks.py /path/to/rgb_flow/ /path/to/output
 
 ### Audio data
 
-This that you've downloaded the videos of EPIC using [this script](https://github.com/epic-kitchens/download-scripts/blob/master/download_videos.sh).
+This step assumes that you've downloaded the videos of EPIC using [this script](https://github.com/epic-kitchens/download-scripts/blob/master/download_videos.sh).
 
 To extract the audio from the videos, run:
 
