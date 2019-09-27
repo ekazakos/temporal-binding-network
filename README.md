@@ -11,6 +11,69 @@ Evangelos Kazakos, Arsha Nagrani, Andrew Zisserman, Dima Damen, <strong>EPIC-Fus
 
 **Tested using python 3.6.8, Pytorch 1.1, and CUDA 8.0**
 
+## Data preparation
+
+### Visual data
+
+This step assumes that you've downloaded the RGB and Flow frames of EPIC dataset using [this script](https://github.com/epic-kitchens/download-scripts/blob/master/download_frames_rgb_flow.sh), and your copy of the dataset has the same folder structure 
+provided in the script (which can be found [here](https://data.bris.ac.uk/data/dataset/3h91syskeag572hl6tvuovwv4d)). Also you should untar each video's frames in its corresponding folder. 
+
+`dataset.py` uses a unified folder structure for all datasets, which is the same as the one used in the [TSN code](https://github.com/yjxiong/tsn-pytorch). Example of the folder structure for RGB and Flow:
+
+```
+├── dataset_root
+|   ├── video1
+|   |   ├── img_0000000000
+|   |   ├── x_0000000000
+|   |   ├── y_0000000000
+|   |   ├── .
+|   |   ├── .
+|   |   ├── .
+|   |   ├── img_0000000100
+|   |   ├── x_0000000100
+|   |   ├── y_0000000100
+|   ├── .
+|   ├── .
+|   ├── .
+|   ├── video10000
+|   |   ├── img_0000000000
+|   |   ├── x_0000000000
+|   |   ├── y_0000000000
+|   |   ├── .
+|   |   ├── .
+|   |   ├── .
+|   |   ├── img_0000000250
+|   |   ├── x_0000000250
+|   |   ├── y_0000000250
+```
+        
+To map the folder structure of EPIC to the above folder structure I've used symlinks. Use the following script to convert
+the original folder structure of EPIC to the folder structure above:
+
+```
+python preprocessing_epic/symlinks.py /path/to/rgb_flow/ /path/to/output
+```
+
+### Audio data
+
+This step assumes that you've downloaded the videos of EPIC using [this script](https://github.com/epic-kitchens/download-scripts/blob/master/download_videos.sh).
+
+To extract the audio from the videos, run:
+
+```
+python preprocessing_epic/extract_audio.py /path/to/videos /path/to/ouput
+```
+
+To load the audio in `dataset.py`, Im using a dictionary, where the keys are the video names and the values are the extracted audio from the previous step. To save the extracted audio into a dictionary, run:
+
+```
+python preprocessing_epic/wav_to_dict.py /path/to/audio /path/to/output
+```
+
+If you don't want to save the audio in a dictionary, and prefer to load the wav files directly in `dataset.py`, you can
+change set `use_audio_dict=False` in `TBNDataset` in `dataset.py`.
+
+
 ## Training
 
 To reproduce the results of the full RGB, Flow, Audio model, run:
