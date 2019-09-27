@@ -21,7 +21,7 @@ class TBNDataSet(data.Dataset):
                  mode='train', use_audio_dict=True):
         self.dataset = dataset
         if audio_path is not None:
-            if self.dataset != 'epic':
+            if not use_audio_dict:
                 self.audio_path = Path(audio_path)
             else:
                 self.audio_path = pickle.load(open(audio_path, 'rb'))
