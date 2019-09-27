@@ -26,6 +26,6 @@ class EpicVideoRecord(VideoRecord):
     def label(self):
         if 'verb_class' in self._series.keys().tolist():
             label = {'verb': self._series['verb_class'], 'noun': self._series['noun_class']}
-        else:
-            label = None
+        else:  # Fake label to deal with the test sets (S1/S2) that dont have any labels
+            label = -10000
         return label

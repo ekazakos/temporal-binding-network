@@ -162,13 +162,13 @@ def evaluate_model(num_class):
                 if i >= max_num:
                     break
                 rst = eval_video(data, net, num_class, device)
-                if label is not None:
+                if label != -10000:  # label exists
                     if args.dataset != 'epic':
                         label_ = label.item()
                     else:
                         label_ = {k: v.item() for k, v in label.items()}
                     results.append((rst, label_))
-                else:
+                else:  # Test set (S1/S2)
                     results.append((rst,))
                 cnt_time = time.time() - proc_start_time
                 print('video {} done, total {}/{}, average {} sec/video'.format(
