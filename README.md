@@ -11,6 +11,42 @@ Evangelos Kazakos, Arsha Nagrani, Andrew Zisserman, Dima Damen, <strong>EPIC-Fus
 
 **Tested using python 3.6.8, Pytorch 1.1, and CUDA 8.0**
 
+## Data preparation
+
+### Visual data
+
+This step assumes that you've downloaded the RGB and Flow frames of EPIC dataset using [this script](https://github.com/epic-kitchens/download-scripts/blob/master/download_frames_rgb_flow.sh), and your copy of the dataset has the same folder structure 
+provided in the script (which can be found [here](https://data.bris.ac.uk/data/dataset/3h91syskeag572hl6tvuovwv4d)).
+
+`dataset.py` uses a unified folder structure for all datasets, which is the same as the one used in the [TSN code](https://github.com/yjxiong/tsn-pytorch). Example of the folder structure for RGB and Flow:
+
+* *dataset_root*
+    * *video1*
+        * *img_0000000000*
+        * *x_0000000000*
+        * *x_0000000000*
+        .
+        .
+        .
+        * *img_0000000100*
+        * *x_0000000100*
+        * *y_0000000100*
+    .
+    .
+    .
+    * *video10000*
+        * *img_0000000000*
+        * *x_0000000000*
+        * *x_0000000000*
+        .
+        .
+        .
+        * *img_0000000250*
+        * *x_0000000250*
+        * *x_0000000250*
+
+### Audio data
+
 ## Training
 
 To reproduce the results of the full RGB, Flow, Audio model, run:
