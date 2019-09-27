@@ -18,7 +18,7 @@ class TBNDataSet(data.Dataset):
                  visual_path=None, audio_path=None,
                  fps=29.94, resampling_rate=44000,
                  num_segments=3, transform=None,
-                 mode='train'):
+                 mode='train', use_audio_dict=True):
         self.dataset = dataset
         if audio_path is not None:
             if self.dataset != 'epic':
@@ -35,6 +35,7 @@ class TBNDataSet(data.Dataset):
         self.mode = mode
         self.resampling_rate = resampling_rate
         self.fps = fps
+        self.use_audio_dict = use_audio_dict
 
         if 'RGBDiff' in self.modality:
             self.new_length['RGBDiff'] += 1  # Diff needs one more image to calculate diff
@@ -61,7 +62,7 @@ class TBNDataSet(data.Dataset):
         left_sec = centre_sec - 0.639
         right_sec = centre_sec + 0.639
         audio_fname = record.untrimmed_video_name + '.wav'
-        if self.dataset != 'epic':
+        if not self.use_audio_dict:
             samples, sr = librosa.core.load(self.audio_path / audio_fname,
                                             sr=None, mono=True)
 
