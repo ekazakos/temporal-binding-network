@@ -20,6 +20,13 @@ provided in the script (which can be found [here](https://data.bris.ac.uk/data/d
 
 `dataset.py` uses a unified folder structure for all datasets, which is the same as the one used in the [TSN code](https://github.com/yjxiong/tsn-pytorch). Example of the folder structure for RGB and Flow:
 
+```
+├── dataset_root
+|   ├── video1
+|   |   ├── img_0000000000
+|   |   ├── x_0000000000
+|   |   ├── y_0000000000
+```
 * dataset_root
     * video1
         * img_0000000000
