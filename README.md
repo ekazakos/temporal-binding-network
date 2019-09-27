@@ -16,7 +16,7 @@ Evangelos Kazakos, Arsha Nagrani, Andrew Zisserman, Dima Damen, <strong>EPIC-Fus
 ### Visual data
 
 This step assumes that you've downloaded the RGB and Flow frames of EPIC dataset using [this script](https://github.com/epic-kitchens/download-scripts/blob/master/download_frames_rgb_flow.sh), and your copy of the dataset has the same folder structure 
-provided in the script (which can be found [here](https://data.bris.ac.uk/data/dataset/3h91syskeag572hl6tvuovwv4d)).
+provided in the script (which can be found [here](https://data.bris.ac.uk/data/dataset/3h91syskeag572hl6tvuovwv4d)). Also you should untar each video's frames in its corresponding folder. 
 
 `dataset.py` uses a unified folder structure for all datasets, which is the same as the one used in the [TSN code](https://github.com/yjxiong/tsn-pytorch). Example of the folder structure for RGB and Flow:
 
@@ -44,8 +44,17 @@ provided in the script (which can be found [here](https://data.bris.ac.uk/data/d
         * img_0000000250
         * x_0000000250
         * y_0000000250
+        
+To map the folder structure of EPIC to the above folder structure I've used symlinks. Use the following script to convert
+the original folder structure of EPIC to the folder structure above:
+
+```
+python preprocessing_epic/symlinks.py /path/to/EPIC/ /path/to/output
+```
 
 ### Audio data
+
+
 
 ## Training
 
