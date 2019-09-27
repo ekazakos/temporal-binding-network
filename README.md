@@ -49,11 +49,27 @@ To map the folder structure of EPIC to the above folder structure I've used syml
 the original folder structure of EPIC to the folder structure above:
 
 ```
-python preprocessing_epic/symlinks.py /path/to/EPIC/ /path/to/output
+python preprocessing_epic/symlinks.py /path/to/rgb_flow/ /path/to/output
 ```
 
 ### Audio data
 
+This that you've downloaded the videos of EPIC using [this script](https://github.com/epic-kitchens/download-scripts/blob/master/download_videos.sh).
+
+To extract the audio from the videos, run:
+
+```
+python preprocessing_epic/extract_audio.py /path/to/videos /path/to/ouput
+```
+
+To load the audio in `dataset.py`, Im using a dictionary, where the keys are the video names and the values are the extracted audio from the previous step. To save the extracted audio into a dictionary, run:
+
+```
+python preprocessing_epic/wav_to_dict.py /path/to/audio /path/to/output
+```
+
+If you don't want to save the audio in a dictionary, and prefer to load the wav files directly in `dataset.py`, you can
+change set `use_audio_dict=False` in `TBNDataset` in `dataset.py`.
 
 
 ## Training
