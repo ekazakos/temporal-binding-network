@@ -26,31 +26,26 @@ provided in the script (which can be found [here](https://data.bris.ac.uk/data/d
 |   |   ├── img_0000000000
 |   |   ├── x_0000000000
 |   |   ├── y_0000000000
+|   |   ├── .
+|   |   ├── .
+|   |   ├── .
+|   |   ├── img_0000000100
+|   |   ├── x_0000000100
+|   |   ├── y_0000000100
+|   ├── .
+|   ├── .
+|   ├── .
+|   ├── video10000
+|   |   ├── img_0000000000
+|   |   ├── x_0000000000
+|   |   ├── y_0000000000
+|   |   ├── .
+|   |   ├── .
+|   |   ├── .
+|   |   ├── img_0000000250
+|   |   ├── x_0000000250
+|   |   ├── y_0000000250
 ```
-* dataset_root
-    * video1
-        * img_0000000000
-        * x_0000000000
-        * y_0000000000
-        * .
-        * .
-        * .
-        * img_0000000100
-        * x_0000000100
-        * y_0000000100
-    * .
-    * .
-    * .
-    * video10000
-        * img_0000000000
-        * x_0000000000
-        * y_0000000000
-        * .
-        * .
-        * .
-        * img_0000000250
-        * x_0000000250
-        * y_0000000250
         
 To map the folder structure of EPIC to the above folder structure I've used symlinks. Use the following script to convert
 the original folder structure of EPIC to the folder structure above:
