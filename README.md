@@ -129,6 +129,8 @@ python test.py epic RGB Flow Spec path/to/checkpoint --test_list /path/to/EPIC_t
 
 `EPIC_test_s1_timestamps.pkl` and `EPIC_test_s2_timestamps.pkl` can be found [here](https://github.com/epic-kitchens/annotations). Similarly testing can be done for any combination of modalities, or individual modalities.
 
+Furthermore, you can use `fuse_results_epic.py` to fuse modalities' scores with late fusion, assuming that you trained individual modalities (similarly to TSN). Lastly, `submission_json.py` can be used for preparing your scores in json format to submit them in the EPIC-Kitchens Action Recognition Challenge. 
+
 ## Publication
 
 Please cite our paper if you find this code useful:
