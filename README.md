@@ -73,6 +73,19 @@ python preprocessing_epic/wav_to_dict.py /path/to/audio /path/to/output
 If you don't want to save the audio in a dictionary, and prefer to load the wav files directly in `dataset.py`, you can
 change set `use_audio_dict=False` in `TBNDataset` in `dataset.py`.
 
+### Pretrained models
+
+To download the pretrained models, run the following on your terminal
+
+```
+$ cd pretrained
+$ bash download.sh
+```
+
+Two files will be downloaded:
+
+* **epic_tbn_rgbflowaudio.pth.tar**, which is the full TBN model(RGB, Flow, Audio) trained on EPIC-Kitchens, which we use to report results in our paper 
+* **kinetics_tsn_flow.pth.tar**, which is a TSN Flow model, trained on Kinetics, downloaded from [here](http://yjxiong.me/others/kinetics_action/). The original model was on Caffe and I converted it to a PyTorch model. This can be used for initialising the Flow stream from Kinetics when training TBN, as we observed an increase in performance in preliminary experiments in comparison to initialising Flow from ImageNet.   
 
 ## Training
 
