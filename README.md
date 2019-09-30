@@ -91,7 +91,7 @@ Two files will be downloaded:
 
 To reproduce the results of the full RGB, Flow, Audio model, run:
 ```
-python train.py epic RGB Flow Spec --train_list /path/to/EPIC_train_action_labels.pkl --val_list /path/to/EPIC_val_action_labels.pkl --visual_path /path/to/rgb+flow --audio_path /path/to/audio --arch BNInception 
+python train.py epic RGB Flow Spec --train_list train_val/EPIC_train_action_labels.pkl --val_list train_val/EPIC_val_action_labels.pkl --visual_path /path/to/rgb+flow --audio_path /path/to/audio --arch BNInception 
 --num_segments 3 --dropout 0.5 --epochs 80 -b 128 --lr 0.01 --lr_steps 60 --gd 20 --partialbn --eval-freq 1 -j 40 
 --pretrained_flow_weights
 ```
@@ -99,39 +99,39 @@ python train.py epic RGB Flow Spec --train_list /path/to/EPIC_train_action_label
 Individual modalities can be trained, as well as any combination of 2 modalities. 
 To train audio, run:
 ```
-python train.py epic Spec --train_list /path/to/EPIC_train_action_labels.pkl --val_list /path/to/EPIC_val_action_labels.pkl 
+python train.py epic Spec --train_list train_val/EPIC_train_action_labels.pkl --val_list train_val/EPIC_val_action_labels.pkl 
 --audio_path /path/to/audio --arch BNInception --num_segments 3 
 --dropout 0.5 --epochs 80 -b 128 --lr 0.001 --lr_steps 60 --gd 20 --partialbn --eval-freq 1 -j 40 
 ```
 
 To train RGB, run:
 ```
-python train.py epic RGB  --train_list /path/to/EPIC_train_action_labels.pkl --val_list /path/to/EPIC_val_action_labels.pkl 
+python train.py epic RGB  --train_list train_val/EPIC_train_action_labels.pkl --val_list train_val/EPIC_val_action_labels.pkl 
 --visual_path /path/to/rgb+flow --arch BNInception --num_segments 3 --dropout 0.5 
 --epochs 80 -b 128 --lr 0.01 --lr_steps 60 --gd 20 --partialbn --eval-freq 1 -j 40 
 ```
 
 To train flow, run:
 ```
-python train.py epic Flow  --train_list /path/to/EPIC_train_action_labels.pkl --val_list /path/to/EPIC_val_action_labels.pkl 
+python train.py epic Flow  --train_list train_val/EPIC_train_action_labels.pkl --val_list train_val/EPIC_val_action_labels.pkl 
 --visual_path /path/to/rgb+flow --arch BNInception --num_segments 3 --dropout 0.5 
 --epochs 80 -b 128 --lr 0.001 --lr_steps 60 --gd 20 --partialbn --eval-freq 1 -j 40 --pretrained_flow_weights
 ```
 
 Example of training RGB+Audio (any other combination can be used):
 ```
-python train.py epic RGB Spec --train_list /path/to/EPIC_train_action_labels.pkl --val_list /path/to/EPIC_val_action_labels.pkl --visual_path /path/to/rgb+flow --audio_path /path/to/audio --arch BNInception 
+python train.py epic RGB Spec --train_list train_val/EPIC_train_action_labels.pkl --val_list train_val/EPIC_val_action_labels.pkl --visual_path /path/to/rgb+flow --audio_path /path/to/audio --arch BNInception 
 --num_segments 3 --dropout 0.5 --epochs 80 -b 128 --lr 0.01 --lr_steps 60 --gd 20 --partialbn --eval-freq 1 -j 40 
 ```
 
-`EPIC_train_action_labels.pkl` and `EPIC_val_action_labels.pkl` should be the result of spliting the original [EPIC_train_action_labels.pkl](https://github.com/epic-kitchens/annotations/blob/master/EPIC_train_action_labels.csv) into training and validation set. 
+`EPIC_train_action_labels.pkl` and `EPIC_val_action_labels.pkl` can be found under `train_val/`. They are the result of spliting the original [EPIC_train_action_labels.pkl](https://github.com/epic-kitchens/annotations/blob/master/EPIC_train_action_labels.csv) into a training and a validation set, by randomly holding out  one untrimmed video from each participant for the 14 kitchens (out of 32) with the largest number of untrimmed videos.  
 
 ## Testing
 
 To compute scores, save scores and labels, and print the accuracy of the validation set using the full modalities, run:
 
 ```
-python test.py epic RGB Flow Spec path/to/checkpoint --test_list /path/to/EPIC_val_action_labels.pkl --visual_path /path/to/rgb+flow --audio_path /path/to/audio --arch BNInception --scores_root scores/ --test_segments 25 --test_crops 1  --dropout 0.5 -j 40
+python test.py epic RGB Flow Spec path/to/checkpoint --test_list train_val/EPIC_val_action_labels.pkl --visual_path /path/to/rgb+flow --audio_path /path/to/audio --arch BNInception --scores_root scores/ --test_segments 25 --test_crops 1  --dropout 0.5 -j 40
 ```
 
 To compute and save scores of the test sets (S1/S2) (since we do not have access to the labels), run:
