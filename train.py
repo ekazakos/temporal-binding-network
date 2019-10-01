@@ -89,7 +89,7 @@ def main():
     # Load pretrained weights for each stream
     if args.pretrained_flow_weights:
         print('Initialize Flow stream from Kinetics')
-        pretrained = os.path.join('models/kinetics/kinetics_tsn_flow.pth.tar')
+        pretrained = os.path.join('pretrained/kinetics_tsn_flow.pth.tar')
         state_dict = torch.load(pretrained)
         for k, v in state_dict.items():
             state_dict[k] = torch.squeeze(v, dim=0)
