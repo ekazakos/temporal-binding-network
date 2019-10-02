@@ -3,7 +3,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from epic_kitchens.meta import training_labels
+from epic_kitchens.meta import training_labels, test_timestamps
 
 
 def softmax(x):
@@ -124,8 +124,7 @@ def main(args):
             prior = None
         results = pd.read_pickle(args.results_dir / ('test_' + test_set + '.pkl'))
         uids = np.zeros(results['test_' + test_set + '_scores']['verb'].shape[0], dtype=np.int)
-        ts = 's1' if test_set == 'seen' else 's2'
-        timestamps = pd.read_pickle(args.annotations_dir / ('EPIC_test_' + ts + '_timestamps.pkl'))
+        timestamps = test_timestamps(test_set)
         for i, (idx, row) in enumerate(timestamps.iterrows()):
             uids[i] = str(idx)
         dump_scores_to_json(results, uids, args.submission_json / (test_set + '.json'), test_set, prior)
@@ -138,6 +137,5 @@ if __name__ == '__main__':
         description="Produce submission JSON from results pickle",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("results_dir", type=Path)
-    parser.add_argument("annotations_dir", type=Path)
     parser.add_argument("submission_json", type=Path)
     main(parser.parse_args())

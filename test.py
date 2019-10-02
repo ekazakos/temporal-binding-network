@@ -11,6 +11,7 @@ from dataset import TBNDataSet
 from models import TBN
 from transforms import *
 import pickle
+from epic_kitchens.meta import test_timestamps
 
 
 def average_crops(results, num_crop, num_class):
@@ -92,7 +93,8 @@ def evaluate_model(num_class):
 
     data_length = net.new_length
 
-    if args.dataset != 'epic' or len(args.test_list) == 1:
+    if args.dataset != 'epic' or args.test_list is not None:
+        # For other datasets, and EPIC when using EPIC_val_action_labels.pkl
         test_loader = torch.utils.data.DataLoader(
             TBNDataSet(args.dataset,
                        args.test_list[0],
@@ -109,6 +111,12 @@ def evaluate_model(num_class):
             batch_size=1, shuffle=False,
             num_workers=args.workers * 2)
     else:
+        # When test_list is not provided,
+        # Seen and Unseen timestamps will be automatically loaded
+        # just to extract scores on EPIC
+        args.test_list = []
+        args.test_list[0] = test_timestamps('seen')
+        args.test_list[1] = test_timestamps('unseen')
         test_seen_loader = torch.utils.data.DataLoader(
             TBNDataSet(args.dataset,
                        args.test_list[0],
@@ -229,7 +237,7 @@ def main():
                         choices=['RGB', 'Flow', 'RGBDiff', 'Spec'],
                         nargs='+', default=['RGB', 'Flow', 'Spec'])
     parser.add_argument('weights_dir', type=str)
-    parser.add_argument('--test_list', nargs='+')
+    parser.add_argument('--test_list', nargs='*')
     parser.add_argument('--visual_path')
     parser.add_argument('--audio_path')
     parser.add_argument('--arch', type=str, default="resnet101")
