@@ -100,12 +100,21 @@ Basic steps:
 
 ## Training
 
-To reproduce the results of the full RGB, Flow, Audio model, run:
+To train the full RGB, Flow, Audio model, run:
 ```
 python train.py epic RGB Flow Spec --train_list train_val/EPIC_train_action_labels.pkl --val_list train_val/EPIC_val_action_labels.pkl --visual_path /path/to/rgb+flow --audio_path /path/to/audio --arch BNInception 
 --num_segments 3 --dropout 0.5 --epochs 80 -b 128 --lr 0.01 --lr_steps 60 --gd 20 --partialbn --eval-freq 1 -j 40 
 --pretrained_flow_weights
 ```
+
+**In the paper, results are reported by training on the whole training set. The pretrained model in `pretrained/` is the result of training in the whole training set** Train/val sets where used for development and hyperparam tuning. To train on the whole dataset, run:
+```
+python train.py epic RGB Flow Spec --visual_path /path/to/rgb+flow --audio_path /path/to/audio --arch BNInception 
+--num_segments 3 --dropout 0.5 --epochs 80 -b 128 --lr 0.01 --lr_steps 60 --gd 20 --partialbn --eval-freq 1 -j 40 
+--pretrained_flow_weights
+```
+
+When `--train_list` is not used, the original training set is loaded (without any splitting). When using the whole training set, validation set cannot be used. 
 
 Individual modalities can be trained, as well as any combination of 2 modalities. 
 To train audio, run:
@@ -148,10 +157,12 @@ python test.py epic RGB Flow Spec path/to/checkpoint --test_list train_val/EPIC_
 To compute and save scores of the test sets (S1/S2) (since we do not have access to the labels), run:
 
 ```
-python test.py epic RGB Flow Spec path/to/checkpoint --test_list /path/to/EPIC_test_s1_timestamps.pkl /path/to/EPIC_test_s2_timestamps.pkl --visual_path /path/to/rgb+flow --audio_path /path/to/audio --arch BNInception --scores_root scores/ --test_segments 25 --test_crops 1  --dropout 0.5 -j 40
+python test.py epic RGB Flow Spec path/to/checkpoint --visual_path /path/to/rgb+flow --audio_path /path/to/audio --arch BNInception --scores_root scores/ --test_segments 25 --test_crops 1  --dropout 0.5 -j 40
 ```
 
-`EPIC_test_s1_timestamps.pkl` and `EPIC_test_s2_timestamps.pkl` can be found [here](https://github.com/epic-kitchens/annotations). Similarly testing can be done for any combination of modalities, or individual modalities.
+When `--test_list` is not provided, the timestamps of S1/S2 are automatically loaded. 
+
+Similarly testing can be done for any combination of modalities, or individual modalities.
 
 Furthermore, you can use `fuse_results_epic.py` to fuse modalities' scores with late fusion, assuming that you trained individual modalities (similarly to TSN). Lastly, `submission_json.py` can be used for preparing your scores in json format to submit them in the EPIC-Kitchens Action Recognition Challenge. 
 
