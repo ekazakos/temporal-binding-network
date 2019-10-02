@@ -85,7 +85,18 @@ $ bash download.sh
 Two files will be downloaded:
 
 * **epic_tbn_rgbflowaudio.pth.tar**, which is the full TBN model(RGB, Flow, Audio) trained on EPIC-Kitchens, which we use to report results in our paper 
-* **kinetics_tsn_flow.pth.tar**, which is a TSN Flow model, trained on Kinetics, downloaded from [here](http://yjxiong.me/others/kinetics_action/). The original model was on Caffe and I converted it to a PyTorch model. This can be used for initialising the Flow stream from Kinetics when training TBN, as we observed an increase in performance in preliminary experiments in comparison to initialising Flow from ImageNet.   
+* **kinetics_tsn_flow.pth.tar**, which is a TSN Flow model, trained on Kinetics, downloaded from [here](http://yjxiong.me/others/kinetics_action/). The original model was on Caffe and I converted it to a PyTorch model. This can be used for initialising the Flow stream from Kinetics when training TBN, as we observed an increase in performance in preliminary experiments in comparison to initialising Flow from ImageNet.
+
+## Train/evaluate with other datasets
+
+Basic steps:
+
+1. Extract the audio in a similar way to the one that I've shown above (.wav files for all dataset in a single folder). Have a look at preprocessing_epic/extract_audio.py for help.
+2. Visual data should have the same folder structure as the one that I've shown above. To do that, map your original folder structure to the one above using symlinks, similarly to epic_preprocessing/symlinks.py
+3. In both train.py and test.py, register the number of classes of your dataset in the variable num_class at the top of main().
+1. Under video_records/ create *your_record.py* which should inherit from VideoRecord. This should parse the lines of a file that contains info about your dataset (paths, labels etc). Have a look at epic_record.py as an example.
+2. Add your dataset in \_parse_list() in dataset.py, by parsing each line of list_file ans storing it to a list, where list_file is the file that contain info for your dataset.
+
 
 ## Training
 
