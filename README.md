@@ -9,7 +9,10 @@ Evangelos Kazakos, Arsha Nagrani, Andrew Zisserman, Dima Damen, <strong>EPIC-Fus
 
 [ArXiv paper](https://arxiv.org/abs/1908.08498)
 
-**Tested using python 3.6.8, Pytorch 1.1, and CUDA 8.0**
+## Requirements
+
+* Install project's requirements in a separate conda environment. In your terminal: `$ conda env create -f environment.yml`. 
+* CUDA 10.0
 
 ## Data preparation
 
