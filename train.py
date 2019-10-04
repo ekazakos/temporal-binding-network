@@ -157,21 +157,35 @@ def main():
     if args.train_list is None:
         # If train_list is not provided, we train on the default
         # dataset which is all the training set
-        args.train_list = training_labels()
-    train_loader = torch.utils.data.DataLoader(
-        TBNDataSet(args.dataset,
-                   args.train_list,
-                   data_length,
-                   args.modality,
-                   image_tmpl,
-                   visual_path=args.visual_path,
-                   audio_path=args.audio_path,
-                   num_segments=args.num_segments,
-                   transform=train_transform,
-                   fps=args.fps,
-                   resampling_rate=args.resampling_rate),
-        batch_size=args.batch_size, shuffle=True,
-        num_workers=args.workers, pin_memory=True)
+        train_loader = torch.utils.data.DataLoader(
+            TBNDataSet(args.dataset,
+                       training_labels(),
+                       data_length,
+                       args.modality,
+                       image_tmpl,
+                       visual_path=args.visual_path,
+                       audio_path=args.audio_path,
+                       num_segments=args.num_segments,
+                       transform=train_transform,
+                       fps=args.fps,
+                       resampling_rate=args.resampling_rate),
+            batch_size=args.batch_size, shuffle=True,
+            num_workers=args.workers, pin_memory=True)
+    else:
+        train_loader = torch.utils.data.DataLoader(
+            TBNDataSet(args.dataset,
+                       args.train_list,
+                       data_length,
+                       args.modality,
+                       image_tmpl,
+                       visual_path=args.visual_path,
+                       audio_path=args.audio_path,
+                       num_segments=args.num_segments,
+                       transform=train_transform,
+                       fps=args.fps,
+                       resampling_rate=args.resampling_rate),
+            batch_size=args.batch_size, shuffle=True,
+            num_workers=args.workers, pin_memory=True)
     if args.train_list is not None:
         # we cannot validate on part of the training set
         # if we use all the training set for training

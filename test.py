@@ -97,7 +97,7 @@ def evaluate_model(num_class):
         # For other datasets, and EPIC when using EPIC_val_action_labels.pkl
         test_loader = torch.utils.data.DataLoader(
             TBNDataSet(args.dataset,
-                       args.test_list[0],
+                       args.test_list,
                        data_length,
                        args.modality,
                        image_tmpl,
@@ -114,12 +114,9 @@ def evaluate_model(num_class):
         # When test_list is not provided,
         # Seen and Unseen timestamps will be automatically loaded
         # just to extract scores on EPIC
-        args.test_list = []
-        args.test_list[0] = test_timestamps('seen')
-        args.test_list[1] = test_timestamps('unseen')
         test_seen_loader = torch.utils.data.DataLoader(
             TBNDataSet(args.dataset,
-                       args.test_list[0],
+                       test_timestamps('seen'),
                        data_length,
                        args.modality,
                        image_tmpl,
@@ -135,7 +132,7 @@ def evaluate_model(num_class):
 
         test_unseen_loader = torch.utils.data.DataLoader(
             TBNDataSet(args.dataset,
-                       args.test_list[1],
+                       test_timestamps('unseen'),
                        data_length,
                        args.modality,
                        image_tmpl,
@@ -154,7 +151,7 @@ def evaluate_model(num_class):
         net.eval()
         data_gen_dict = {}
         results_dict = {}
-        if args.dataset != 'epic' or len(args.test_list) == 1:
+        if args.dataset != 'epic' or args.test_list is not None:
             data_gen_dict['test'] = test_loader
         else:
             data_gen_dict['test_seen'] = test_seen_loader
@@ -237,7 +234,7 @@ def main():
                         choices=['RGB', 'Flow', 'RGBDiff', 'Spec'],
                         nargs='+', default=['RGB', 'Flow', 'Spec'])
     parser.add_argument('weights_dir', type=str)
-    parser.add_argument('--test_list', nargs='*')
+    parser.add_argument('--test_list')
     parser.add_argument('--visual_path')
     parser.add_argument('--audio_path')
     parser.add_argument('--arch', type=str, default="resnet101")
