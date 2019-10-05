@@ -9,6 +9,19 @@ Evangelos Kazakos, Arsha Nagrani, Andrew Zisserman, Dima Damen, <strong>EPIC-Fus
 
 [ArXiv paper](https://arxiv.org/abs/1908.08498)
 
+## Citing
+
+When using this code, kindly reference:
+
+```
+@InProceedings{kazakos2019TBN,
+    author    = {Kazakos, Evangelos and Nagrani, Arsha and Zisserman, Andrew and Damen, Dima},
+    title     = {EPIC-Fusion: Audio-Visual Temporal Binding for Egocentric Action Recognition},
+    booktitle = {IEEE/CVF International Conference on Computer Vision (ICCV)},
+    year      = {2019}
+}
+```
+
 ## Requirements
 
 * Install project's requirements in a separate conda environment. In your terminal: `$ conda env create -f environment.yml`. 
@@ -169,15 +182,6 @@ Similarly testing can be done for any combination of modalities, or individual m
 
 Furthermore, you can use `fuse_results_epic.py` to fuse modalities' scores with late fusion, assuming that you trained individual modalities (similarly to TSN). Lastly, `submission_json.py` can be used for preparing your scores in json format to submit them in the EPIC-Kitchens Action Recognition Challenge. 
 
-## Publication
+## License 
 
-Please cite our paper if you find this code useful:
-
-```
-@InProceedings{kazakos2019TBN,
-    author    = {Kazakos, Evangelos and Nagrani, Arsha and Zisserman, Andrew and Damen, Dima},
-    title     = {EPIC-Fusion: Audio-Visual Temporal Binding for Egocentric Action Recognition},
-    booktitle = {IEEE/CVF International Conference on Computer Vision (ICCV)},
-    year      = {2019}
-}
-```
+The code is published under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License, found [here](https://creativecommons.org/licenses/by-nc-sa/4.0/).
