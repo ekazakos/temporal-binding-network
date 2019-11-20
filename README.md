@@ -182,6 +182,22 @@ Similarly testing can be done for any combination of modalities, or individual m
 
 Furthermore, you can use `fuse_results_epic.py` to fuse modalities' scores with late fusion, assuming that you trained individual modalities (similarly to TSN). Lastly, `submission_json.py` can be used for preparing your scores in json format to submit them in the EPIC-Kitchens Action Recognition Challenge. 
 
+## Validation set results
+
+The following table contains the results of training and evaluating on the splits from `train_val/`.
+
+**Top-1 Accuracy**:
+
+| VERB | NOUN | ACTION
+| ---- | ---- | ------
+| 63.31 | 46.00 | 34.83 |
+
+**Top-5 Accuracy**:
+
+| VERB | NOUN | ACTION
+| ---- | ---- | ------
+| 88.29 | 68.31 | 54.09 |
+ 
 ## License 
 
 The code is published under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License, found [here](https://creativecommons.org/licenses/by-nc-sa/4.0/).
