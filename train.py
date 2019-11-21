@@ -6,6 +6,7 @@ import torch.backends.cudnn as cudnn
 import torch.optim
 from torch.optim.lr_scheduler import MultiStepLR
 from torch.nn.utils import clip_grad_norm_
+import pandas as pd
 
 from dataset import TBNDataSet
 from models import TBN
@@ -174,7 +175,7 @@ def main():
     else:
         train_loader = torch.utils.data.DataLoader(
             TBNDataSet(args.dataset,
-                       args.train_list,
+                       pd.read_pickle(args.train_list),
                        data_length,
                        args.modality,
                        image_tmpl,
@@ -191,7 +192,7 @@ def main():
         # if we use all the training set for training
         val_loader = torch.utils.data.DataLoader(
             TBNDataSet(args.dataset,
-                       args.val_list,
+                       pd.read_pickle(args.val_list),
                        data_length,
                        args.modality,
                        image_tmpl,

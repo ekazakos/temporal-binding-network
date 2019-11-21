@@ -102,7 +102,7 @@ class TBNDataSet(data.Dataset):
 
     def _parse_list(self):
         if self.dataset == 'epic':
-            self.video_list = [EpicVideoRecord(tup) for tup in pd.read_pickle(self.list_file).iterrows()]
+            self.video_list = [EpicVideoRecord(tup) for tup in self.list_file.iterrows()]
 
 
     def _sample_indices(self, record, modality):
