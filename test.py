@@ -6,6 +6,7 @@ import torch.nn.functional as F
 import torch.nn.parallel
 import torch.optim
 from sklearn.metrics import confusion_matrix, accuracy_score
+import pandas as pd
 
 from dataset import TBNDataSet
 from models import TBN
@@ -97,7 +98,7 @@ def evaluate_model(num_class):
         # For other datasets, and EPIC when using EPIC_val_action_labels.pkl
         test_loader = torch.utils.data.DataLoader(
             TBNDataSet(args.dataset,
-                       args.test_list,
+                       pd.read_pickle(args.test_list),
                        data_length,
                        args.modality,
                        image_tmpl,
