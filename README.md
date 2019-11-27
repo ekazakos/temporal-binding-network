@@ -197,6 +197,8 @@ The following table contains the results of training and evaluating on the split
 | VERB | NOUN | ACTION
 | ---- | ---- | ------
 | 88.29 | 68.31 | 54.09 |
+
+**NOTE**: For official comparisons with TBN, please submit your results to the test server of EPIC-KITCHENS.
  
 ## License 
 
