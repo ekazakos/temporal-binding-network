@@ -24,7 +24,7 @@ When using this code, kindly reference:
 
 ## News
 
-* We now provide support for training/evaluating on the newly released dataset [EPIC-KITCHENS-100](https://epic-kitchens.github.io/2020-100).
+* We now provide support for training/evaluating on the newly released dataset [EPIC-KITCHENS-100](https://epic-kitchens.github.io/2020-100), as well as a pretrained model on EPIC-KITCHENS-100.
 
 ## Requirements
 
