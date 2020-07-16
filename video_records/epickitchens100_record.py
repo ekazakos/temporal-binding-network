@@ -1,7 +1,7 @@
 from .video_record import VideoRecord
 
 
-class Epic100VideoRecord(VideoRecord):
+class EpicKitchens100_VideoRecord(VideoRecord):
     def __init__(self, tup):
         self._index = str(tup[0])
         self._series = tup[1]

@@ -1,2 +1,3 @@
-from .epic55_record import Epic55VideoRecord
-from .epic100_record import Epic100VideoRecord
+from .epickitchens55_record import EpicKitchens55_VideoRecord
+from .epickitchens100_record import EpicKitchens100_VideoRecord
+

@@ -1,4 +1,4 @@
-from video_records import Epic55VideoRecord, Epic100VideoRecord
+from video_records import EpicKitchens55_VideoRecord, EpicKitchens100_VideoRecord
 import torch.utils.data as data
 
 import librosa
@@ -100,9 +100,9 @@ class TBNDataSet(data.Dataset):
 
     def _parse_list(self):
         if self.dataset == 'epic-kitchens-55':
-            self.video_list = [Epic55VideoRecord(tup) for tup in self.list_file.iterrows()]
+            self.video_list = [EpicKitchens55_VideoRecord(tup) for tup in self.list_file.iterrows()]
         elif self.dataset == 'epic-kitchens-100':
-            self.video_list = [Epic100VideoRecord(tup) for tup in self.list_file.iterrows()]
+            self.video_list = [EpicKitchens100_VideoRecord(tup) for tup in self.list_file.iterrows()]
 
     def _sample_indices(self, record, modality):
         """
