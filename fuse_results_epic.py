@@ -27,18 +27,18 @@ def softmax(x):
     return exp_x / np.sum(exp_x, axis=1).reshape((-1, 1))
 
 
-def fuse_scores(scores_dict, split):
+def fuse_scores(scores_dict):
     modalities_combinations = [('rgb', 'flow'), ('rgb', 'spec'),
                                ('flow', 'spec'), ('rgb', 'flow', 'spec')]
 
     fused_scores = {}
     for mod_comb in modalities_combinations:
         name = '_'.join(mod_comb)
-        fused_scores[name] = {'test_' + split + '_scores': {}}
+        fused_scores[name] = {'scores': {}}
         for task in ['verb', 'noun']:
-            scores_list = [scores_dict[m]['test_' + split + '_scores'][task] for m in mod_comb]
+            scores_list = [scores_dict[m]['scores'][task] for m in mod_comb]
             scores_list = [softmax(scores.mean(axis=(1, 2))) for scores in scores_list]
-            fused_scores[name]['test_' + split + '_scores'][task] = np.mean(scores_list, axis=0)
+            fused_scores[name]['scores'][task] = np.mean(scores_list, axis=0)
 
     return fused_scores
 
@@ -51,7 +51,7 @@ def main(args):
         spec_scores = pd.read_pickle(args.spec / ('test_' + split + '.pkl'))
 
         scores_dict = {'rgb': rgb_scores, 'flow': flow_scores, 'spec': spec_scores}
-        fused_scores = fuse_scores(scores_dict, split)
+        fused_scores = fuse_scores(scores_dict)
 
         for key in fused_scores.keys():
             output_dir = args.scores_root / key / ('test_' + split + '.pkl')

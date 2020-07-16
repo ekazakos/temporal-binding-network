@@ -67,11 +67,11 @@ def scores_to_json(scores):
     return entries
 
 
-def compute_score_dicts(results, test_set, prior):
-    verb_scores = results['test_' + test_set + '_scores']['verb']
+def compute_score_dicts(results, prior):
+    verb_scores = results['scores']['verb']
     if len(verb_scores.shape) == 4:
         verb_scores = verb_scores.mean(axis=(1, 2))
-    noun_scores = results['test_' + test_set + '_scores']['noun']
+    noun_scores = results['scores']['noun']
     if len(noun_scores.shape) == 4:
         noun_scores = noun_scores.mean(axis=(1, 2))
     actions, action_scores = compute_action_scores(verb_scores, noun_scores)
@@ -101,8 +101,8 @@ def to_json(uids, verb_scores_dict, noun_scores_dict, action_scores_dict):
     }
 
 
-def dump_scores_to_json(results, uids, filepath, test_set, prior):
-    verb_scores_dict, noun_scores_dict, action_scores_dict = compute_score_dicts(results, test_set, prior)
+def dump_scores_to_json(results, uids, filepath, prior):
+    verb_scores_dict, noun_scores_dict, action_scores_dict = compute_score_dicts(results, prior)
     results_dict = to_json(uids, verb_scores_dict, noun_scores_dict, action_scores_dict)
 
     filepath.parent.mkdir(exist_ok=True, parents=True)
@@ -123,11 +123,11 @@ def main(args):
         else:
             prior = None
         results = pd.read_pickle(args.results_dir / ('test_' + test_set + '.pkl'))
-        uids = np.zeros(results['test_' + test_set + '_scores']['verb'].shape[0], dtype=np.int)
+        uids = np.zeros(results['scores']['verb'].shape[0], dtype=np.int)
         timestamps = test_timestamps(test_set)
         for i, (idx, row) in enumerate(timestamps.iterrows()):
             uids[i] = str(idx)
-        dump_scores_to_json(results, uids, args.submission_json / (test_set + '.json'), test_set, prior)
+        dump_scores_to_json(results, uids, args.submission_json / (test_set + '.json'), prior)
 
 
 if __name__ == '__main__':
