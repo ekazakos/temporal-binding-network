@@ -199,9 +199,9 @@ Furthermore, you can use `fuse_results_epic.py` to fuse modalities' scores with 
 python test.py epic-kitchens-100 RGB Flow Spec path/to/checkpoint --test_list train_val/EPIC_100_validation.pkl --visual_path /path/to/rgb+flow --audio_path /path/to/audio --arch BNInception --scores_root scores/ --test_segments 25 --test_crops 1  --dropout 0.5 -j 40
 ```
 
-## Validation set results
+## Validation set results of EPIC-KITCHENS-55
 
-The following table contains the results of training and evaluating on the splits from `train_val/`.
+The following table contains the results of training and evaluating EPIC-KITCHENS-55 on the splits from `train_val/`.
 
 **Top-1 Accuracy**:
 
