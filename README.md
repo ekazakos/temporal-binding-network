@@ -163,16 +163,6 @@ python train.py epic-kitchens-55 RGB Spec --train_list train_val/EPIC_train_acti
 
 `EPIC_train_action_labels.pkl` and `EPIC_val_action_labels.pkl` can be found under `train_val/`. They are the result of spliting the original [EPIC_train_action_labels.pkl](https://github.com/epic-kitchens/annotations/blob/master/EPIC_train_action_labels.csv) into a training and a validation set, by randomly holding out  one untrimmed video from each participant for the 14 kitchens (out of 32) with the largest number of untrimmed videos.  
 
-## Training on EPIC-KITCHENS-100
-
-```
-python train.py epic-kitchens-100 RGB Flow Spec --train_list train_val/EPIC_100_train.pkl --val_list train_val/EPIC_100_validation.pkl 
---visual_path /path/to/rgb+flow --audio_path /path/to/audio --arch BNInception --num_segments 6 --dropout 0.5 --epochs 80 -b 64 --lr 0.01 --lr_steps 40 60 
---gd 20 --partialbn --eval-freq 1 -j 40 --pretrained_flow_weights
-```
-
-`EPIC_100_train.pkl` and `EPIC_100_validation.pkl` can be found in the annotations repository of EPIC-KITCHENS-100 ([link](https://github.com/epic-kitchens/epic-kitchens-100-annotations))
-
 ## Testing on EPIC-KITCHENS-55
 
 To compute scores, save scores and labels, and print the accuracy of the validation set using all modalities, run:
@@ -193,12 +183,6 @@ Similarly testing can be done for any combination of modalities, or individual m
 
 Furthermore, you can use `fuse_results_epic.py` to fuse modalities' scores with late fusion, assuming that you trained individual modalities (similarly to TSN). Lastly, `submission_json.py` can be used for preparing your scores in json format to submit them in the EPIC-Kitchens Action Recognition Challenge. 
 
-## Testing on EPIC-KITCHENS-100
-
-```
-python test.py epic-kitchens-100 RGB Flow Spec path/to/checkpoint --test_list train_val/EPIC_100_validation.pkl --visual_path /path/to/rgb+flow --audio_path /path/to/audio --arch BNInception --scores_root scores/ --test_segments 25 --test_crops 1  --dropout 0.5 -j 40
-```
-
 ## Validation set results of EPIC-KITCHENS-55
 
 The following table contains the results of training and evaluating EPIC-KITCHENS-55 on the splits from `train_val/`.
@@ -214,6 +198,36 @@ The following table contains the results of training and evaluating EPIC-KITCHEN
 | VERB | NOUN | ACTION
 | ---- | ---- | ------
 | 88.29 | 68.31 | 54.09 |
+
+## Training on EPIC-KITCHENS-100
+
+```
+python train.py epic-kitchens-100 RGB Flow Spec --train_list train_val/EPIC_100_train.pkl --val_list train_val/EPIC_100_validation.pkl 
+--visual_path /path/to/rgb+flow --audio_path /path/to/audio --arch BNInception --num_segments 6 --dropout 0.5 --epochs 80 -b 64 --lr 0.01 --lr_steps 40 60 
+--gd 20 --partialbn --eval-freq 1 -j 40 --pretrained_flow_weights
+```
+
+`EPIC_100_train.pkl` and `EPIC_100_validation.pkl` can be found in the annotations repository of EPIC-KITCHENS-100 ([link](https://github.com/epic-kitchens/epic-kitchens-100-annotations))
+
+## Testing on EPIC-KITCHENS-100
+
+```
+python test.py epic-kitchens-100 RGB Flow Spec path/to/checkpoint --test_list train_val/EPIC_100_validation.pkl --visual_path /path/to/rgb+flow --audio_path /path/to/audio --arch BNInception --scores_root scores/ --test_segments 25 --test_crops 1  --dropout 0.5 -j 40
+```
+
+## Validation set results of EPIC-KITCHENS-100
+  
+**Top-1 Accuracy**:
+
+| VERB | NOUN | ACTION
+| ---- | ---- | ------
+| 65.26 | 47.49 | 36.08 |
+
+**Top-5 Accuracy**:
+  
+| VERB | NOUN | ACTION
+| ---- | ---- | ------
+| 90.32 | 73.94 | 58.04 |
 
 **NOTE**: For official comparisons with TBN, please submit your results to the test server of EPIC-KITCHENS.
  
