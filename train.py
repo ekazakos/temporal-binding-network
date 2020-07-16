@@ -15,7 +15,6 @@ from opts import parser
 from tensorboardX import SummaryWriter
 from datetime import datetime
 from collections import OrderedDict
-from epic_kitchens.meta import training_labels
 
 best_prec1 = 0
 training_iterations = 0
@@ -45,8 +44,10 @@ def main():
         num_class = 51
     elif args.dataset == 'kinetics':
         num_class = 400
-    elif args.dataset == 'epic':
+    elif args.dataset == 'epic-kitchens-55':
         num_class = (125, 352)
+    elif args.dataset == 'epic-kitchens-100':
+        num_class = (97, 300)
     else:
         raise ValueError('Unknown dataset ' + args.dataset)
 
@@ -155,56 +156,34 @@ def main():
                 ToTorchFormatTensor(div=False),
             ])
 
-    if args.train_list is None:
-        # If train_list is not provided, we train on the default
-        # dataset which is all the training set
-        train_loader = torch.utils.data.DataLoader(
-            TBNDataSet(args.dataset,
-                       training_labels(),
-                       data_length,
-                       args.modality,
-                       image_tmpl,
-                       visual_path=args.visual_path,
-                       audio_path=args.audio_path,
-                       num_segments=args.num_segments,
-                       transform=train_transform,
-                       fps=args.fps,
-                       resampling_rate=args.resampling_rate),
-            batch_size=args.batch_size, shuffle=True,
-            num_workers=args.workers, pin_memory=True)
-    else:
-        train_loader = torch.utils.data.DataLoader(
-            TBNDataSet(args.dataset,
-                       pd.read_pickle(args.train_list),
-                       data_length,
-                       args.modality,
-                       image_tmpl,
-                       visual_path=args.visual_path,
-                       audio_path=args.audio_path,
-                       num_segments=args.num_segments,
-                       transform=train_transform,
-                       fps=args.fps,
-                       resampling_rate=args.resampling_rate),
-            batch_size=args.batch_size, shuffle=True,
-            num_workers=args.workers, pin_memory=True)
-    if args.train_list is not None:
-        # we cannot validate on part of the training set
-        # if we use all the training set for training
-        val_loader = torch.utils.data.DataLoader(
-            TBNDataSet(args.dataset,
-                       pd.read_pickle(args.val_list),
-                       data_length,
-                       args.modality,
-                       image_tmpl,
-                       visual_path=args.visual_path,
-                       audio_path=args.audio_path,
-                       num_segments=args.num_segments,
-                       mode='val',
-                       transform=val_transform,
-                       fps=args.fps,
-                       resampling_rate=args.resampling_rate),
-            batch_size=args.batch_size, shuffle=False,
-            num_workers=args.workers, pin_memory=True)
+    train_loader = torch.utils.data.DataLoader(
+        TBNDataSet(args.dataset,
+                   pd.read_pickle(args.train_list),
+                   data_length,
+                   args.modality,
+                   image_tmpl,
+                   visual_path=args.visual_path,
+                   audio_path=args.audio_path,
+                   num_segments=args.num_segments,
+                   transform=train_transform,
+                   resampling_rate=args.resampling_rate),
+        batch_size=args.batch_size, shuffle=True,
+        num_workers=args.workers, pin_memory=True)
+
+    val_loader = torch.utils.data.DataLoader(
+        TBNDataSet(args.dataset,
+                   pd.read_pickle(args.val_list),
+                   data_length,
+                   args.modality,
+                   image_tmpl,
+                   visual_path=args.visual_path,
+                   audio_path=args.audio_path,
+                   num_segments=args.num_segments,
+                   mode='val',
+                   transform=val_transform,
+                   resampling_rate=args.resampling_rate),
+        batch_size=args.batch_size, shuffle=False,
+        num_workers=args.workers, pin_memory=True)
 
     # define loss function (criterion) and optimizer
     criterion = torch.nn.CrossEntropyLoss()
@@ -229,32 +208,24 @@ def main():
         validate(val_loader, model, criterion, device)
         return
     if args.save_stats:
-        if args.dataset != 'epic':
+        if 'epic' not in args.dataset:
             stats_dict = {'train_loss': np.zeros((args.epochs,)),
                           'val_loss': np.zeros((args.epochs,)),
                           'train_acc': np.zeros((args.epochs,)),
                           'val_acc': np.zeros((args.epochs,))}
-        elif args.dataset == 'epic':
-            if args.train_list is not None:
-                stats_dict = {'train_loss': np.zeros((args.epochs,)),
-                              'train_verb_loss': np.zeros((args.epochs,)),
-                              'train_noun_loss': np.zeros((args.epochs,)),
-                              'train_acc': np.zeros((args.epochs,)),
-                              'train_verb_acc': np.zeros((args.epochs,)),
-                              'train_noun_acc': np.zeros((args.epochs,)),
-                              'val_loss': np.zeros((args.epochs,)),
-                              'val_verb_loss': np.zeros((args.epochs,)),
-                              'val_noun_loss': np.zeros((args.epochs,)),
-                              'val_acc': np.zeros((args.epochs,)),
-                              'val_verb_acc': np.zeros((args.epochs,)),
-                              'val_noun_acc': np.zeros((args.epochs,))}
-            else:
-                stats_dict = {'train_loss': np.zeros((args.epochs,)),
-                              'train_verb_loss': np.zeros((args.epochs,)),
-                              'train_noun_loss': np.zeros((args.epochs,)),
-                              'train_acc': np.zeros((args.epochs,)),
-                              'train_verb_acc': np.zeros((args.epochs,)),
-                              'train_noun_acc': np.zeros((args.epochs,))}
+        else:
+            stats_dict = {'train_loss': np.zeros((args.epochs,)),
+                          'train_verb_loss': np.zeros((args.epochs,)),
+                          'train_noun_loss': np.zeros((args.epochs,)),
+                          'train_acc': np.zeros((args.epochs,)),
+                          'train_verb_acc': np.zeros((args.epochs,)),
+                          'train_noun_acc': np.zeros((args.epochs,)),
+                          'val_loss': np.zeros((args.epochs,)),
+                          'val_verb_loss': np.zeros((args.epochs,)),
+                          'val_noun_loss': np.zeros((args.epochs,)),
+                          'val_acc': np.zeros((args.epochs,)),
+                          'val_verb_acc': np.zeros((args.epochs,)),
+                          'val_noun_acc': np.zeros((args.epochs,))}
 
     for epoch in range(args.start_epoch, args.epochs):
         scheduler.step()
@@ -264,29 +235,21 @@ def main():
             for k, v in training_metrics.items():
                 stats_dict[k][epoch] = v
         # evaluate on validation set
-        if args.train_list is not None:
-            if (epoch + 1) % args.eval_freq == 0 or epoch == args.epochs - 1:
-                test_metrics = validate(val_loader, model, criterion, device)
-                if args.save_stats:
-                    for k, v in test_metrics.items():
-                        stats_dict[k][epoch] = v
-                prec1 = test_metrics['val_acc']
-                # remember best prec@1 and save checkpoint
-                is_best = prec1 > best_prec1
-                best_prec1 = max(prec1, best_prec1)
-                save_checkpoint({
-                'epoch': epoch + 1,
-                'arch': args.arch,
-                'state_dict': model.state_dict(),
-                'best_prec1': best_prec1,
-                }, is_best)
-        else:  #  No validation set
+        if (epoch + 1) % args.eval_freq == 0 or epoch == args.epochs - 1:
+            test_metrics = validate(val_loader, model, criterion, device)
+            if args.save_stats:
+                for k, v in test_metrics.items():
+                    stats_dict[k][epoch] = v
+            prec1 = test_metrics['val_acc']
+            # remember best prec@1 and save checkpoint
+            is_best = prec1 > best_prec1
+            best_prec1 = max(prec1, best_prec1)
             save_checkpoint({
-                'epoch': epoch + 1,
-                'arch': args.arch,
-                'state_dict': model.state_dict(),
-                'best_prec1': training_metrics['train_acc'],
-            }, False)
+            'epoch': epoch + 1,
+            'arch': args.arch,
+            'state_dict': model.state_dict(),
+            'best_prec1': best_prec1,
+            }, is_best)
 
     summaryWriter.close()
 
@@ -306,7 +269,7 @@ def train(train_loader, model, criterion, optimizer, epoch, device):
     losses = AverageMeter()
     top1 = AverageMeter()
     top5 = AverageMeter()
-    if args.dataset == 'epic':
+    if 'epic' in args.dataset:
         verb_losses = AverageMeter()
         noun_losses = AverageMeter()
         verb_top1 = AverageMeter()
@@ -335,7 +298,7 @@ def train(train_loader, model, criterion, optimizer, epoch, device):
         # compute output
         output = model(input)
         batch_size = input[args.modality[0]].size(0)
-        if args.dataset != 'epic':
+        if 'epic' not in args.dataset:
             target = target.to(device)
             loss = criterion(output, target)
             # measure accuracy and record loss
@@ -397,7 +360,7 @@ def train(train_loader, model, criterion, optimizer, epoch, device):
                 'training': top5.avg
             }, training_iterations)
 
-            if args.dataset != 'epic':
+            if 'epic' not in args.dataset:
 
                 message = ('Epoch: [{0}][{1}/{2}], lr: {lr:.5f}\t'
                            'Time {batch_time.avg:.3f} ({batch_time.avg:.3f})\t'
@@ -448,7 +411,7 @@ def train(train_loader, model, criterion, optimizer, epoch, device):
                     noun_top1=noun_top1, noun_top5=noun_top5, lr=optimizer.param_groups[-1]['lr'])
 
             print(message)
-    if args.dataset != 'epic':
+    if 'epic' not in args.dataset:
         training_metrics = {'train_loss': losses.avg, 'train_acc': top1.avg}
     else:
         training_metrics = {'train_loss': losses.avg,
@@ -468,7 +431,7 @@ def validate(val_loader, model, criterion, device):
         losses = AverageMeter()
         top1 = AverageMeter()
         top5 = AverageMeter()
-        if args.dataset == 'epic':
+        if 'epic' in args.dataset:
             verb_losses = AverageMeter()
             noun_losses = AverageMeter()
             verb_top1 = AverageMeter()
@@ -486,7 +449,7 @@ def validate(val_loader, model, criterion, device):
             # compute output
             output = model(input)
             batch_size = input[args.modality[0]].size(0)
-            if args.dataset != 'epic':
+            if 'epic' not in args.dataset:
                 target = target.to(device)
                 loss = criterion(output, target)
                 # measure accuracy and record loss
@@ -521,7 +484,7 @@ def validate(val_loader, model, criterion, device):
             batch_time.update(time.time() - end)
             end = time.time()
 
-        if args.dataset != 'epic':
+        if 'epic' not in args.dataset:
             summaryWriter.add_scalars('data/loss', {
                 'validation': losses.avg,
             }, training_iterations)
@@ -580,7 +543,7 @@ def validate(val_loader, model, criterion, device):
                                                      loss=losses)
 
         print(message)
-        if args.dataset != 'epic':
+        if 'epic' not in args.dataset:
             test_metrics = {'val_loss': losses.avg, 'val_acc': top1.avg}
         else:
             test_metrics = {'val_loss': losses.avg,

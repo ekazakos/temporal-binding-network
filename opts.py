@@ -1,6 +1,7 @@
 import argparse
 parser = argparse.ArgumentParser(description="PyTorch implementation of Temporal Binding Network")
-parser.add_argument('dataset', type=str, choices=['ucf101', 'hmdb51', 'kinetics', 'epic'])
+parser.add_argument('dataset', type=str, choices=['ucf101', 'hmdb51', 'kinetics', 'epic-kitchens-55',
+                                                  'epic-kitchens-100'])
 parser.add_argument('modality', type=str, nargs='+', choices=['RGB', 'Flow', 'RGBDiff', 'Spec'],
 	                default=['RGB', 'Flow', 'Spec'])
 parser.add_argument('--train_list', type=str)
@@ -65,7 +66,6 @@ parser.add_argument('-pr', '--pretrained_flow_weights',
                     help='Use pretrained weights from Kinetics for flow')
 parser.add_argument('--experiment_suffix', default="", type=str)
 
-parser.add_argument('--fps', type=float, default=60)
 parser.add_argument('--resampling_rate', type=int, default=24000)
 parser.add_argument('--midfusion', choices=['concat', 'context_gating', 'multimodal_gating'],
                     default='concat')

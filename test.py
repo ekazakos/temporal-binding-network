@@ -12,7 +12,6 @@ from dataset import TBNDataSet
 from models import TBN
 from transforms import *
 import pickle
-from epic_kitchens.meta import test_timestamps
 
 
 def average_crops(results, num_crop, num_class):
@@ -31,7 +30,7 @@ def eval_video(data, net, num_class, device):
 
     rst = net(data)
 
-    if args.dataset != 'epic':
+    if 'epic' not in args.dataset:
         return average_crops(rst, num_crop, num_class)
     else:
         return {'verb': average_crops(rst[0], num_crop, num_class[0]),
@@ -94,94 +93,47 @@ def evaluate_model(num_class):
 
     data_length = net.new_length
 
-    if args.dataset != 'epic' or args.test_list is not None:
-        # For other datasets, and EPIC when using EPIC_val_action_labels.pkl
-        test_loader = torch.utils.data.DataLoader(
-            TBNDataSet(args.dataset,
-                       pd.read_pickle(args.test_list),
-                       data_length,
-                       args.modality,
-                       image_tmpl,
-                       visual_path=args.visual_path,
-                       audio_path=args.audio_path,
-                       num_segments=args.test_segments,
-                       mode='test',
-                       transform=test_transform,
-                       fps=args.fps,
-                       resampling_rate=args.resampling_rate),
-            batch_size=1, shuffle=False,
-            num_workers=args.workers * 2)
-    else:
-        # When test_list is not provided,
-        # Seen and Unseen timestamps will be automatically loaded
-        # just to extract scores on EPIC
-        test_seen_loader = torch.utils.data.DataLoader(
-            TBNDataSet(args.dataset,
-                       test_timestamps('seen'),
-                       data_length,
-                       args.modality,
-                       image_tmpl,
-                       visual_path=args.visual_path,
-                       audio_path=args.audio_path,
-                       num_segments=args.test_segments,
-                       mode='test',
-                       transform=test_transform,
-                       fps=args.fps,
-                       resampling_rate=args.resampling_rate),
-            batch_size=1, shuffle=False,
-            num_workers=args.workers * 2)
-
-        test_unseen_loader = torch.utils.data.DataLoader(
-            TBNDataSet(args.dataset,
-                       test_timestamps('unseen'),
-                       data_length,
-                       args.modality,
-                       image_tmpl,
-                       visual_path=args.visual_path,
-                       audio_path=args.audio_path,
-                       num_segments=args.test_segments,
-                       mode='test',
-                       transform=test_transform,
-                       fps=args.fps,
-                       resampling_rate=args.resampling_rate),
-            batch_size=1, shuffle=False,
-            num_workers=args.workers * 2)
+    test_loader = torch.utils.data.DataLoader(
+        TBNDataSet(args.dataset,
+                   pd.read_pickle(args.test_list),
+                   data_length,
+                   args.modality,
+                   image_tmpl,
+                   visual_path=args.visual_path,
+                   audio_path=args.audio_path,
+                   num_segments=args.test_segments,
+                   mode='test',
+                   transform=test_transform,
+                   resampling_rate=args.resampling_rate),
+        batch_size=1, shuffle=False,
+        num_workers=args.workers * 2)
 
     net = torch.nn.DataParallel(net, device_ids=args.gpus).to(device)
     with torch.no_grad():
         net.eval()
-        data_gen_dict = {}
-        results_dict = {}
-        if args.dataset != 'epic' or args.test_list is not None:
-            data_gen_dict['test'] = test_loader
-        else:
-            data_gen_dict['test_seen'] = test_seen_loader
-            data_gen_dict['test_unseen'] = test_unseen_loader
 
-        for split, data_gen in data_gen_dict.items():
-            results = []
-            total_num = len(data_gen.dataset)
+        results = []
+        total_num = len(test_loader.dataset)
 
-            proc_start_time = time.time()
-            max_num = args.max_num if args.max_num > 0 else total_num
-            for i, (data, label) in enumerate(data_gen):
-                if i >= max_num:
-                    break
-                rst = eval_video(data, net, num_class, device)
-                if label != -10000:  # label exists
-                    if args.dataset != 'epic':
-                        label_ = label.item()
-                    else:
-                        label_ = {k: v.item() for k, v in label.items()}
-                    results.append((rst, label_))
-                else:  # Test set (S1/S2)
-                    results.append((rst,))
-                cnt_time = time.time() - proc_start_time
-                print('video {} done, total {}/{}, average {} sec/video'.format(
-                    i, i + 1, total_num, float(cnt_time) / (i + 1)))
+        proc_start_time = time.time()
+        max_num = args.max_num if args.max_num > 0 else total_num
+        for i, (data, label) in enumerate(test_loader):
+            if i >= max_num:
+                break
+            rst = eval_video(data, net, num_class, device)
+            if label != -10000:  # label exists
+                if 'epic' not in args.dataset:
+                    label_ = label.item()
+                else:
+                    label_ = {k: v.item() for k, v in label.items()}
+                results.append((rst, label_))
+            else:  # Test set (S1/S2)
+                results.append((rst,))
+            cnt_time = time.time() - proc_start_time
+            print('video {} done, total {}/{}, average {} sec/video'.format(
+                i, i + 1, total_num, float(cnt_time) / (i + 1)))
 
-            results_dict[split] = results
-        return results_dict
+        return results
 
 
 def print_accuracy(scores, labels):
@@ -199,30 +151,28 @@ def print_accuracy(scores, labels):
     print('Average Class Accuracy {:.02f}%'.format(np.mean(cls_acc) * 100))
 
 
-def save_scores(results_dict, scores_dir):
+def save_scores(results, scores_file):
 
-    for split, results in results_dict.items():
-        save_dict = {}
-        if args.dataset != 'epic':
-            scores = np.array([result[0] for result in results])
-            labels = np.array([result[1] for result in results])
+    save_dict = {}
+    if 'epic' not in args.dataset:
+        scores = np.array([result[0] for result in results])
+        labels = np.array([result[1] for result in results])
+    else:
+        if len(results[0]) == 2:
+            keys = results[0][0].keys()
+            scores = {k: np.array([result[0][k] for result in results]) for k in keys}
+            labels = {k: np.array([result[1][k] for result in results]) for k in keys}
         else:
-            if len(results[0]) == 2:
-                keys = results[0][0].keys()
-                scores = {k: np.array([result[0][k] for result in results]) for k in keys}
-                labels = {k: np.array([result[1][k] for result in results]) for k in keys}
-            else:
-                keys = results[0][0].keys()
-                scores = {k: np.array([result[0][k] for result in results]) for k in keys}
-                labels = None
+            keys = results[0][0].keys()
+            scores = {k: np.array([result[0][k] for result in results]) for k in keys}
+            labels = None
 
-        save_dict[split + '_scores'] = scores
-        if labels is not None:
-            save_dict[split + '_labels'] = labels
+    save_dict['scores'] = scores
+    if labels is not None:
+        save_dict['labels'] = labels
 
-        scores_file = os.path.join(scores_dir, split + '.pkl')
-        with open(scores_file, 'wb') as f:
-            pickle.dump(save_dict, f)
+    with open(scores_file, 'wb') as f:
+        pickle.dump(save_dict, f)
 
 
 def main():
@@ -230,7 +180,7 @@ def main():
     parser = argparse.ArgumentParser(description="Standard video-level" +
                                      " testing")
     parser.add_argument('dataset', type=str,
-                        choices=['ucf101', 'hmdb51', 'kinetics', 'epic'])
+                        choices=['ucf101', 'hmdb51', 'kinetics', 'epic-kitchens-55', 'epic-kitchens-100'])
     parser.add_argument('modality', type=str,
                         choices=['RGB', 'Flow', 'RGBDiff', 'Spec'],
                         nargs='+', default=['RGB', 'Flow', 'Spec'])
@@ -239,7 +189,7 @@ def main():
     parser.add_argument('--visual_path')
     parser.add_argument('--audio_path')
     parser.add_argument('--arch', type=str, default="resnet101")
-    parser.add_argument('--scores_root', type=str, default='scores')
+    parser.add_argument('--scores_file', type=str, default='scores')
     parser.add_argument('--test_segments', type=int, default=25)
     parser.add_argument('--max_num', type=int, default=-1)
     parser.add_argument('--test_crops', type=int, default=10)
@@ -252,11 +202,9 @@ def main():
                         help='number of data loading workers (default: 4)')
     parser.add_argument('--gpus', nargs='+', type=int, default=None)
     parser.add_argument('--flow_prefix', type=str, default='')
-    parser.add_argument('--fps', type=float, default=60)
     parser.add_argument('--resampling_rate', type=int, default=24000)
     parser.add_argument('--midfusion', choices=['concat', 'gating_concat', 'multimodal_gating'],
-                    default='concat')
-    parser.add_argument('--exp_suffix', default='')
+                        default='concat')
 
     global args
     args = parser.parse_args()
@@ -269,29 +217,28 @@ def main():
         num_class = 400
     elif args.dataset == 'beoid':
         num_class = 34
-    elif args.dataset == 'epic':
+    elif args.dataset == 'epic-kitchens-55':
         num_class = (125, 352)
+    elif args.dataset == 'epic-kitchens-100':
+        num_class = (97, 300)
     else:
         raise ValueError('Unknown dataset ' + args.dataset)
 
-    results_dict = evaluate_model(num_class)
-    experiment_name = os.path.normpath(args.weights_dir).split('/')[-2]
-    for split, results in results_dict.items():
-        if args.dataset == 'epic':
-            if len(results[0]) == 2:
-                keys = results[0][0].keys()
-                for task in keys:
-                    print('Evaluation of {} in {}'.format(task.upper(), split.upper()))
-                    print_accuracy([result[0][task] for result in results],
-                                   [result[1][task] for result in results])
-        else:
-            print_accuracy([result[0] for result in results],
-                           [result[1] for result in results])
+    results = evaluate_model(num_class)
+    if 'epic' in args.dataset:
+        if len(results[0]) == 2:
+            keys = results[0][0].keys()
+            for task in keys:
+                print('Evaluation of {}'.format(task.upper()))
+                print_accuracy([result[0][task] for result in results],
+                               [result[1][task] for result in results])
+    else:
+        print_accuracy([result[0] for result in results],
+                       [result[1] for result in results])
 
-    scores_dir = os.path.join(args.scores_root, experiment_name + args.exp_suffix)
-    if not os.path.exists(scores_dir):
-        os.makedirs(scores_dir)
-    save_scores(results_dict, scores_dir)
+    if not os.path.exists(os.path.dirname(args.scores_file)):
+        os.makedirs(os.path.dirname(args.scores_file))
+    save_scores(results, args.scores_file)
 
 
 if __name__ == '__main__':

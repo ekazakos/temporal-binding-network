@@ -1,4 +1,4 @@
-from video_records import EpicVideoRecord
+from video_records import Epic55VideoRecord, Epic100VideoRecord
 import torch.utils.data as data
 
 import librosa
@@ -16,7 +16,7 @@ class TBNDataSet(data.Dataset):
     def __init__(self, dataset, list_file,
                  new_length, modality, image_tmpl,
                  visual_path=None, audio_path=None,
-                 fps=29.94, resampling_rate=44000,
+                 resampling_rate=44000,
                  num_segments=3, transform=None,
                  mode='train', use_audio_dict=True):
         self.dataset = dataset
@@ -34,7 +34,6 @@ class TBNDataSet(data.Dataset):
         self.transform = transform
         self.mode = mode
         self.resampling_rate = resampling_rate
-        self.fps = fps
         self.use_audio_dict = use_audio_dict
 
         if 'RGBDiff' in self.modality:
@@ -58,7 +57,7 @@ class TBNDataSet(data.Dataset):
 
     def _extract_sound_feature(self, record, idx):
 
-        centre_sec = (record.start_frame + idx) / self.fps
+        centre_sec = (record.start_frame + idx) / record.fps['Spec']
         left_sec = centre_sec - 0.639
         right_sec = centre_sec + 0.639
         audio_fname = record.untrimmed_video_name + '.wav'
@@ -90,20 +89,20 @@ class TBNDataSet(data.Dataset):
             idx_untrimmed = record.start_frame + idx
             return [Image.open(os.path.join(self.visual_path, record.untrimmed_video_name, self.image_tmpl[modality].format(idx_untrimmed))).convert('RGB')]
         elif modality == 'Flow':
-            idx_untrimmed = int(np.floor((record.start_frame / 2))) + idx
-            # idx_untrimmed = record.start_frame + idx
+            rgb2flow_fps_ratio = record.fps['Flow'] / float(record.fps['RGB'])
+            idx_untrimmed = int(np.floor((record.start_frame * rgb2flow_fps_ratio))) + idx
             x_img = Image.open(os.path.join(self.visual_path, record.untrimmed_video_name, self.image_tmpl[modality].format('x', idx_untrimmed))).convert('L')
             y_img = Image.open(os.path.join(self.visual_path, record.untrimmed_video_name, self.image_tmpl[modality].format('y', idx_untrimmed))).convert('L')
-
             return [x_img, y_img]
         elif modality == 'Spec':
             spec = self._extract_sound_feature(record, idx)
             return [Image.fromarray(spec)]
 
     def _parse_list(self):
-        if self.dataset == 'epic':
-            self.video_list = [EpicVideoRecord(tup) for tup in self.list_file.iterrows()]
-
+        if self.dataset == 'epic-kitchens-55':
+            self.video_list = [Epic55VideoRecord(tup) for tup in self.list_file.iterrows()]
+        elif self.dataset == 'epic-kitchens-100':
+            self.video_list = [Epic100VideoRecord(tup) for tup in self.list_file.iterrows()]
 
     def _sample_indices(self, record, modality):
         """

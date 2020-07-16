@@ -1,7 +1,7 @@
 from .video_record import VideoRecord
 
 
-class EpicVideoRecord(VideoRecord):
+class Epic55VideoRecord(VideoRecord):
     def __init__(self, tup):
         self._index = str(tup[0])
         self._series = tup[1]
@@ -19,8 +19,15 @@ class EpicVideoRecord(VideoRecord):
         return self._series['stop_frame'] - 2
 
     @property
+    def fps(self):
+        return {'RGB': 60,
+                'Flow': 30,
+                'Spec': 60}
+
+    @property
     def num_frames(self):
-        return {'RGB': self.end_frame - self.start_frame, 'Flow': (self.end_frame - self.start_frame) / 2,
+        return {'RGB': self.end_frame - self.start_frame,
+                'Flow': (self.end_frame - self.start_frame) / 2,
                 'Spec': self.end_frame - self.start_frame}
     @property
     def label(self):
