@@ -13,18 +13,22 @@ if __name__ == '__main__':
     if not args.symlinks_dir.exists():
         args.symlinks_dir.mkdir(parents=True)
 
-    for modality in ['rgb', 'flow']:
-        if modality == 'rgb':
-            pattern = 'P[0-3][0-9]/P[0-3][0-9]_[0-9][0-9]/'
-        else:
-            pattern = 'P[0-3][0-9]/P[0-3][0-9]_[0-9][0-9]/*/'
-        for split in ['train', 'test']:
-            modality_split_dir = args.data_dir / modality / split
-            for source_file in modality_split_dir.glob(pattern):
-                if modality == 'rgb':
-                    person, video = str(source_file).split('/')[-2:]
+    data_dir = args.data_dir
+    participant_pattern = 'P??'
+
+    for participant_dir in data_dir.glob(participant_pattern):
+        for modality in ['rgb_frames', 'flow_frames']:
+            if modality == 'rgb_frames':
+                video_id_pattern = 'P??_*??/'
+            else:
+                video_id_pattern = 'P??_*??/*/'
+
+            frames_dir = participant_dir / modality
+            for source_file in frames_dir.glob(video_id_pattern):
+                if modality == 'rgb_frames':
+                    video = str(source_file).split('/')[-1:]
                 else:
-                    person, video, _ = str(source_file).split('/')[-3:]
+                    video, _ = str(source_file).split('/')[-2:]
 
                 link_path = args.symlinks_dir / video
                 if not link_path.exists():
@@ -35,7 +39,7 @@ if __name__ == '__main__':
                     f = 'frame_{:010d}.jpg'.format(i + 1)
                     source = source_file / f
 
-                    if modality == 'rgb':
+                    if modality == 'rgb_frames':
                         link = link_path / 'img_{:010d}.jpg'.format(i)
                     else:
                         if source_file.name == 'u':
