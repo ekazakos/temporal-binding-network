@@ -54,6 +54,10 @@ parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
                     help='number of data loading workers (default: 4)')
 parser.add_argument('--resume', default='', type=str, metavar='PATH',
                     help='path to latest checkpoint (default: none)')
+parser.add_argument('-pr_flow', '--pretrained_flow',
+                    help='path to pretrained TSN Flow stream on Kinetics')
+parser.add_argument('-pr', '--pretrained',
+                    help='path to pretrained TBN model')
 parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',
                     help='evaluate model on validation set')
 parser.add_argument('--snapshot_pref', type=str, default="")
@@ -61,9 +65,6 @@ parser.add_argument('--start-epoch', default=0, type=int, metavar='N',
                     help='manual epoch number (useful on restarts)')
 parser.add_argument('--gpus', nargs='+', type=int, default=None)
 parser.add_argument('--flow_prefix', default="", type=str)
-parser.add_argument('-pr', '--pretrained_flow_weights',
-                    action='store_true',
-                    help='Use pretrained weights from Kinetics for flow')
 parser.add_argument('--experiment_suffix', default="", type=str)
 
 parser.add_argument('--resampling_rate', type=int, default=24000)

@@ -31,8 +31,5 @@ class EpicKitchens55_VideoRecord(VideoRecord):
                 'Spec': self.end_frame - self.start_frame}
     @property
     def label(self):
-        if 'verb_class' in self._series.keys().tolist():
-            label = {'verb': self._series['verb_class'], 'noun': self._series['noun_class']}
-        else:  # Fake label to deal with the test sets (S1/S2) that dont have any labels
-            label = -10000
-        return label
+        return {'verb': self._series['verb_class'] if 'verb_class' in self._series else -10000,
+                'noun': self._series['noun_class'] if 'noun_class' in self._series else -10000}

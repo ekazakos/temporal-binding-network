@@ -70,7 +70,7 @@ def main():
     # Resume training from a checkpoint
     if args.resume:
         if os.path.isfile(args.resume):
-            print(("=> loading checkpoint '{}'".format(args.resume)))
+            print(("=> loading checkpoint {}".format(args.resume)))
             checkpoint = torch.load(args.resume)
             args.start_epoch = checkpoint['epoch']
             best_prec1 = checkpoint['best_prec1']
@@ -82,16 +82,28 @@ def main():
                   .format(args.evaluate, checkpoint['epoch'])))
         else:
             print(("=> no checkpoint found at '{}'".format(args.resume)))
-
-    # Load pretrained weights for each stream
-    if args.pretrained_flow_weights:
-        print('Initialize Flow stream from Kinetics')
-        pretrained = os.path.join('pretrained/kinetics_tsn_flow.pth.tar')
-        state_dict = torch.load(pretrained)
-        for k, v in state_dict.items():
-            state_dict[k] = torch.squeeze(v, dim=0)
-        base_model = getattr(model, 'flow')
-        base_model.load_state_dict(state_dict, strict=False)
+    elif args.pretrained:
+        if os.path.isfile(args.pretrained):
+            print(("=> loading pretrained TBN model from {}".format(args.pretrained)))
+            checkpoint = torch.load(args.pretrained)
+            state_dict_new = OrderedDict()
+            for k, v in checkpoint['state_dict'].items():
+                state_dict_new[k.split('.', 1)[1]] = v
+            model.load_state_dict(state_dict_new)
+            print("Pretrained TBN model loaded")
+        else:
+            print(("=> no pretrained model found at '{}'".format(args.pretrained)))
+    elif args.pretrained_flow:
+        if os.path.isfile(args.pretrained_flow):
+            print(("=> loading pretrained TSN Flow stream on Kinetics from {}".format(args.pretrained_flow)))
+            state_dict = torch.load(args.pretrained_flow)
+            for k, v in state_dict.items():
+                state_dict[k] = torch.squeeze(v, dim=0)
+            base_model = getattr(model, 'flow')
+            base_model.load_state_dict(state_dict, strict=False)
+            print("Pretrained TSN Flow stream on Kinetics loaded")
+        else:
+            print(("=> no pretrained model found at '{}'".format(args.pretrained_flow)))
 
     # Freeze stream weights (leaves only fusion and classification trainable)
     if args.freeze:
