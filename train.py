@@ -299,7 +299,7 @@ def train(train_loader, model, criterion, optimizer, epoch, device):
 
     end = time.time()
 
-    for i, (input, target) in enumerate(train_loader):
+    for i, (input, target, _) in enumerate(train_loader):
         # measure data loading time
 
         data_time.update(time.time() - end)
@@ -454,7 +454,7 @@ def validate(val_loader, model, criterion, device):
         model.eval()
 
         end = time.time()
-        for i, (input, target) in enumerate(val_loader):
+        for i, (input, target, _) in enumerate(val_loader):
             for m in args.modality:
                 input[m] = input[m].to(device)
 

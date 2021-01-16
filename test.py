@@ -117,18 +117,18 @@ def evaluate_model(num_class):
 
         proc_start_time = time.time()
         max_num = args.max_num if args.max_num > 0 else total_num
-        for i, (data, label) in enumerate(test_loader):
+        for i, (data, label, meta) in enumerate(test_loader):
             if i >= max_num:
                 break
             rst = eval_video(data, net, num_class, device)
-            if label != -10000:  # label exists
-                if 'epic' not in args.dataset:
-                    label_ = label.item()
-                else:
-                    label_ = {k: v.item() for k, v in label.items()}
+
+            if 'epic' not in args.dataset:
+                label_ = label.item()
                 results.append((rst, label_))
-            else:  # Test set (S1/S2)
-                results.append((rst,))
+            else:
+                label_ = {k: v.item() for k, v in label.items()}
+                results.append((rst, label_, meta))
+
             cnt_time = time.time() - proc_start_time
             print('video {} done, total {}/{}, average {} sec/video'.format(
                 i, i + 1, total_num, float(cnt_time) / (i + 1)))
@@ -153,23 +153,18 @@ def print_accuracy(scores, labels):
 
 def save_scores(results, scores_file):
 
-    save_dict = {}
     if 'epic' not in args.dataset:
+        save_dict = {}
         scores = np.array([result[0] for result in results])
         labels = np.array([result[1] for result in results])
-    else:
-        if len(results[0]) == 2:
-            keys = results[0][0].keys()
-            scores = {k: np.array([result[0][k] for result in results]) for k in keys}
-            labels = {k: np.array([result[1][k] for result in results]) for k in keys}
-        else:
-            keys = results[0][0].keys()
-            scores = {k: np.array([result[0][k] for result in results]) for k in keys}
-            labels = None
-
-    save_dict['scores'] = scores
-    if labels is not None:
+        save_dict['scores'] = scores
         save_dict['labels'] = labels
+    else:
+        keys = results[0][0].keys()
+        save_dict = {k+'_output': np.array([result[0][k] for result in results]) for k in keys}
+        metadata = [result[2] for result in results]
+        key = list(metadata[0].keys())[0]
+        save_dict[key] = np.array([m[key] for m in metadata])
 
     with open(scores_file, 'wb') as f:
         pickle.dump(save_dict, f)
@@ -226,12 +221,11 @@ def main():
 
     results = evaluate_model(num_class)
     if 'epic' in args.dataset:
-        if len(results[0]) == 2:
-            keys = results[0][0].keys()
-            for task in keys:
-                print('Evaluation of {}'.format(task.upper()))
-                print_accuracy([result[0][task] for result in results],
-                               [result[1][task] for result in results])
+        keys = results[0][0].keys()
+        for task in keys:
+            print('Evaluation of {}'.format(task.upper()))
+            print_accuracy([result[0][task] for result in results],
+                           [result[1][task] for result in results])
     else:
         print_accuracy([result[0] for result in results],
                        [result[1] for result in results])

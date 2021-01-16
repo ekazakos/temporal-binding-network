@@ -181,7 +181,7 @@ class TBNDataSet(data.Dataset):
                     p += 1
 
         process_data = self.transform[modality](images)
-        return process_data, record.label
+        return process_data, record.label, record.metadata
 
     def __len__(self):
         return len(self.video_list)

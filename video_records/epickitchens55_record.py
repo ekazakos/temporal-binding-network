@@ -31,5 +31,10 @@ class EpicKitchens55_VideoRecord(VideoRecord):
                 'Spec': self.end_frame - self.start_frame}
     @property
     def label(self):
-        return {'verb': self._series['verb_class'] if 'verb_class' in self._series else -10000,
-                'noun': self._series['noun_class'] if 'noun_class' in self._series else -10000}
+        return {'verb': self._series['verb_class'] if 'verb_class' in self._series else -1,
+                'noun': self._series['noun_class'] if 'noun_class' in self._series else -1}
+
+    @property
+    def metadata(self):
+        return {'uid': self._index}
+
