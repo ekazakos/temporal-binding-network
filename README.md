@@ -93,18 +93,9 @@ This is done because the untrimmed videos of EPIC-KITCHENS are very large, and l
 
 ### Pretrained models
 
-To download the pretrained models, run the following on your terminal
-
-```
-$ cd pretrained
-$ bash download.sh
-```
-
-Three files will be downloaded:
-
-* **epic-kitchens-55_tbn_rgbflowaudio.pth.tar**, which is the full TBN model (RGB, Flow, Audio) trained on EPIC-KITCHENS-55, which we use to report results in our paper
-* **epic-kitchens-100_tbn_rgbflowaudio.pth.tar**, which is the full TBN model (RGB, Flow, Audio) trained on EPIC-KITCHENS-100
-* **kinetics_tsn_flow.pth.tar**, which is a TSN Flow model, trained on Kinetics, downloaded from [here](http://yjxiong.me/others/kinetics_action/). The original model was on Caffe and I converted it to a PyTorch model. This can be used for initialising the Flow stream from Kinetics when training TBN, as we observed an increase in performance in preliminary experiments in comparison to initialising Flow from ImageNet.
+* **TBN-epic-kitchens-55.pth**: [Download link](https://www.dropbox.com/s/3w5p5wq5uwz2nhq/TBN-epic-kitchens-55.pth?dl=0). This is the full TBN model (RGB, Flow, Audio) trained on EPIC-KITCHENS-55, which we use to report results in our paper.
+* **TBN-epic-kitchens-100.pth**: [Download link](https://www.dropbox.com/s/ogs0ea191bht9dr/TBN-epic-kitchens-100.pth?dl=0). This is the full TBN model (RGB, Flow, Audio) trained on EPIC-KITCHENS-100. 
+* **TSN-kinetics-flow.pth**: [Download link](https://www.dropbox.com/s/nd5ruq1jnufp19o/TSN-kinetics-flow.pth?dl=0). This is a TSN Flow model, trained on Kinetics, downloaded from [here](http://yjxiong.me/others/kinetics_action/). The original model was on Caffe and I converted it to a PyTorch model. This can be used for initialising the Flow stream from Kinetics when training TBN, as we observed an increase in performance in preliminary experiments in comparison to initialising Flow from ImageNet.
 
 ## Train/evaluate with other datasets
 
@@ -123,14 +114,14 @@ To train the full RGB, Flow, Audio model, run:
 ```
 python train.py epic-kitchens-55 RGB Flow Spec --train_list train_val/EPIC_train_action_labels.pkl --val_list train_val/EPIC_val_action_labels.pkl 
 --visual_path /path/to/rgb+flow --audio_path /path/to/audio --arch BNInception --num_segments 3 --dropout 0.5 --epochs 80 -b 128 --lr 0.01 --lr_steps 60 
---gd 20 --partialbn --eval-freq 1 -j 40 --pretrained_flow_weights
+--gd 20 --partialbn --eval-freq 1 -j 40 --pretrained_flow /path/to/pretrained/kinetics/flow/model
 ```
 
 **In the paper, results are reported by training on the whole training set. The pretrained model in `pretrained/` is the result of training in the whole training set** Train/val sets where used for development and hyperparam tuning. To train on the whole dataset, concatenate `EPIC_train_action_labels.pkl` and `EPIC_val_action_labels.pkl`, found under `train_val`, in `EPIC_train+val_action_labels.pkl` and run:
 ```
 python train.py epic-kitchens-55 RGB Flow Spec --train_list train_val/EPIC_train+val_action_labels.pkl --val_list train_val/EPIC_val_action_labels.pkl 
 --visual_path /path/to/rgb+flow --audio_path /path/to/audio --arch BNInception --num_segments 3 --dropout 0.5 --epochs 80 -b 128 --lr 0.01 --lr_steps 60 
---gd 20 --partialbn --eval-freq 1 -j 40 --pretrained_flow_weights
+--gd 20 --partialbn --eval-freq 1 -j 40 --pretrained_flow /path/to/pretrained/kinetics/flow/model
 ```
 
 Individual modalities can be trained, as well as any combination of 2 modalities. 
@@ -152,7 +143,7 @@ To train flow, run:
 ```
 python train.py epic-kitchens-55 Flow  --train_list train_val/EPIC_train_action_labels.pkl --val_list train_val/EPIC_val_action_labels.pkl 
 --visual_path /path/to/rgb+flow --arch BNInception --num_segments 3 --dropout 0.5 --epochs 80 -b 128 --lr 0.001 --lr_steps 60 --gd 20 
---partialbn --eval-freq 1 -j 40 --pretrained_flow_weights
+--partialbn --eval-freq 1 -j 40 --pretrained_flow /path/to/pretrained/kinetics/flow/model
 ```
 
 Example of training RGB+Audio (any other combination can be used):
@@ -204,7 +195,7 @@ The following table contains the results of training and evaluating EPIC-KITCHEN
 ```
 python train.py epic-kitchens-100 RGB Flow Spec --train_list EPIC_100_train.pkl --val_list EPIC_100_validation.pkl 
 --visual_path /path/to/rgb+flow --audio_path /path/to/audio --arch BNInception --num_segments 6 --dropout 0.5 --epochs 80 -b 64 --lr 0.01 --lr_steps 40 60 
---gd 20 --partialbn --eval-freq 1 -j 40 --pretrained_flow_weights
+--gd 20 --partialbn --eval-freq 1 -j 40 --pretrained_flow /path/to/pretrained/kinetics/flow/model
 ```
 
 `EPIC_100_train.pkl` and `EPIC_100_validation.pkl` can be found in the annotations repository of EPIC-KITCHENS-100 ([link](https://github.com/epic-kitchens/epic-kitchens-100-annotations))
