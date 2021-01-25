@@ -89,7 +89,7 @@ def main():
             state_dict_new = OrderedDict()
             for k, v in checkpoint['state_dict'].items():
                 state_dict_new[k.split('.', 1)[1]] = v
-            model.load_state_dict(state_dict_new)
+            model.load_state_dict(state_dict_new, strict=False)
             print("Pretrained TBN model loaded")
         else:
             print(("=> no pretrained model found at '{}'".format(args.pretrained)))
